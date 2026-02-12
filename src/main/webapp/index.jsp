@@ -21,9 +21,9 @@
 
         .container {
             text-align: center;
-            background: rgba(255, 255, 255, 0.1); /* Cam efekti (glassmorphism) */
+            background: rgba(255, 255, 255, 0.1); 
             padding: 3rem;
-            border-radius: 20px;
+            border-radius: 20px; /*  hmm */
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
             border: 1px border rgba(255, 255, 255, 0.18);
@@ -33,7 +33,6 @@
             font-size: 4rem;
             margin: 0;
             letter-spacing: -1px;
-            /* Hafif bir yazı gölgesiyle derinlik kazandırdık */
             text-shadow: 2px 2px 10px rgba(0,0,0,0.2);
         }
 
