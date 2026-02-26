@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>To-Do App</title>
+  <style>
+    body{font-family:system-ui,Arial;margin:2rem;background:#f6f8fa}
+    .box{max-width:600px;margin:0 auto;background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+    ul{list-style:none;padding:0}
+    li{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}
+    .completed{text-decoration:line-through;color:#999}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>To-Do</h2>
+    <div>
+      <input id="taskInput" placeholder="New task" style="width:70%" />
+      <button id="addBtn">Add</button>
+    </div>
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+    const api = '/api/tasks';
+    async function fetchTasks(){
+      const res = await fetch(api);
+      const data = await res.json();
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+      data.forEach(t=>{
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="${t.completed? 'completed':''}">${escapeHtml(t.title)}</span>
+          <span>
+            <button data-id="${t.id}" class="del">Del</button>
+            <button data-id="${t.id}" class="toggle">${t.completed? 'Undo':'Done'}</button>
+          </span>`;
+        list.appendChild(li);
+      });
+      attachEvents();
+    }
+    function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function attachEvents(){
+      document.querySelectorAll('.del').forEach(b=>b.onclick=async e=>{
+        const id=e.target.dataset.id; await fetch(api+'/'+id,{method:'DELETE'}); fetchTasks();
+      });
+      document.querySelectorAll('.toggle').forEach(b=>b.onclick=async e=>{
+        const id=e.target.dataset.id; const current = e.target.textContent==='Undo';
+        await fetch(api+'/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({completed:!current})}); fetchTasks();
+      });
+    }
+    document.getElementById('addBtn').onclick=async ()=>{
+      const v=document.getElementById('taskInput').value.trim(); if(!v) return;
+      await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:v})});
+      document.getElementById('taskInput').value=''; fetchTasks();
+    }
+    fetchTasks();
+  </script>
+</body>
+</html>
